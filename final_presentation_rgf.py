@@ -8,8 +8,8 @@ from numpy import (pi,sqrt,sin,cos,arange,diag,squeeze,eye,imag,
 from numpy.linalg import inv
 import matplotlib.pyplot as plt
 from matplotlib import cm
-#import cmath
-#from mpl_toolkits.mplot3d import Axes3D
+import cmath
+from mpl_toolkits.mplot3d import Axes3D
 
 # define system size and mesh
 k=1
@@ -41,7 +41,7 @@ g_1n=zeros((m,n,n),dtype=np.complex)
 for y in range(mode_max):    #convert real space to mode space
     phi[:,y]=sqrt(2/(n+1))*sin(pi*(y+1)*(arange(n)+1)/(n+1))
 
-g0=phi.dot(diag(g_mode)).dot(phi.T)  #real space nearest hopping in lead
+g0=phi.dot(diag(g_mode)).dot(phi.T)  #real space nearest hopping in lead, mode space to real space
 gl_nn[0,:,:]=g0   
 gl_n0[0,:,:]=g0
 gl_0n[0,:,:]=g0
@@ -52,7 +52,7 @@ gr_1n[0,:,:]=g0
 for conf in range(zushu):
     eps=concatenate((ones((n,1)),wg+np.random.random((n,m-2))*tiny,ones((n,1))),axis=1)  #define disorder system
 
-    for x in range(2,m):    
+    for x in range(2,m):    #iteration
         temp=inv(diag(eps[:,x-1])*kd**2-h0-squeeze(gl_nn[x-2,:,:]))
         gl_nn[x-1,:,:]=temp  
         gl_n0[x-1,:,:]=-temp.dot(squeeze(gl_n0[x-2,:,:]))
@@ -76,7 +76,7 @@ for conf in range(zushu):
         g_0n[x-1,:,:]=squeeze(gl_0n[x-1,:,:])+squeeze(gl_0n[x-1,:,:]).dot(squeeze(gr_nn[x,:,:])).dot(squeeze(g_nn[x-1,:,:]))
         g_1n[x-1,:,:]=-squeeze(gr_1n[x,:,:]).dot(squeeze(g_nn[x-1,:,:]))
     
-    s11=zeros((n,m-2),dtype=np.complex)
+    s11=zeros((n,m-2),dtype=np.complex)    #return probability
     for x in range(2,m):
         s11[:,x-2]=diag(squeeze(g_nn[x-1,:,:]))
     
